@@ -10,9 +10,11 @@ namespace src
         static void Main(string[] args)
         {
             IEnumerable<string> input = File.ReadLines(args[0]);
-            IEnumerable<int> frequenciesChanges = Parser.Parse(input);
+            int[] frequenciesChanges = Parser.Parse(input).ToArray();
             int finalFrequency = frequenciesChanges.Sum();
-            Console.WriteLine(finalFrequency);
+            int repetedFrequency = Solver.Solve(frequenciesChanges);
+
+            Console.WriteLine($"{finalFrequency}, {repetedFrequency}");
         }
     }
 }

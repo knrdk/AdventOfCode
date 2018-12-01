@@ -6,7 +6,7 @@ using src;
 
 namespace Tests
 {
-    public class Tests
+    public class ParserTests
     {
         [SetUp]
         public void Setup()
