@@ -1,8 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using LanguageExt;
 using NUnit.Framework;
 using src;
+using static LanguageExt.Option<int>;
 
 namespace Tests
 {
@@ -20,7 +22,7 @@ namespace Tests
             string[] input = null;
 
             // act
-            IEnumerable<int> result = Parser.Parse(input);
+            IEnumerable<Option<int>> result = Parser.Parse(input);
 
             // assert
             Assert.IsEmpty(result);
@@ -33,7 +35,7 @@ namespace Tests
             var input = new string[0];
 
             // act
-            IEnumerable<int> result = Parser.Parse(input);
+            IEnumerable<Option<int>> result = Parser.Parse(input);
 
             // assert
             Assert.IsEmpty(result);
@@ -46,10 +48,10 @@ namespace Tests
             string input = "+5";
 
             // act
-            int result = Parser.Parse(input);
+            Option<int> result = Parser.Parse(input);
 
             // assert
-            Assert.AreEqual(5, result);
+            Assert.AreEqual(Some(5), result);
         }
 
         [Test]
@@ -59,10 +61,10 @@ namespace Tests
             string input = "-8";
 
             // act
-            int result = Parser.Parse(input);
+            Option<int> result = Parser.Parse(input);
 
             // assert
-            Assert.AreEqual(-8, result);
+            Assert.AreEqual(Some(-8), result);
         }
 
         [TestCase("+0")]
@@ -71,10 +73,10 @@ namespace Tests
         public void ItShouldWorksForZero(string zero)
         {
             // act
-            int result = Parser.Parse(zero);
+            Option<int> result = Parser.Parse(zero);
 
             // assert
-            Assert.AreEqual(0, result);
+            Assert.AreEqual(Some(0), result);
         }
 
         [TestCase(-54343)]
@@ -92,21 +94,21 @@ namespace Tests
             string numberAsText = sign + Math.Abs(expectedNumber).ToString();
 
             // act
-            int result = Parser.Parse(numberAsText);
+            Option<int> result = Parser.Parse(numberAsText);
 
             // assert
-            Assert.AreEqual(expectedNumber, result);
+            Assert.AreEqual(Some(expectedNumber), result);
         }
 
         [Test]
         public void ItShouldWorksForSequence()
         {
             // arrange
-            int[] expectedNumbers = new[] { 54, -21, 54342, 0, -2 };
+            Option<int>[] expectedNumbers = new[] { 54, -21, 54342, 0, -2 }.Select(Some).ToArray();
             string[] input = new[] { "+54", "-21", "+54342", "0", "-2" };
         
             // act
-            int[] actualNumber = Parser.Parse(input).ToArray();
+            Option<int>[] actualNumber = Parser.Parse(input).ToArray();
 
             // assert
             Assert.AreEqual(expectedNumbers, actualNumber);
