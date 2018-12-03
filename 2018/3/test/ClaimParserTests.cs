@@ -16,6 +16,7 @@ namespace Tests
             ClaimDto result = ClaimParser.Parse(input);
 
             // assert
+            Assert.AreEqual(1, result.Id);
             Assert.AreEqual(2, result.LeftEdgePosition);
             Assert.AreEqual(3, result.TopEdgePosition);
             Assert.AreEqual(4, result.Width);

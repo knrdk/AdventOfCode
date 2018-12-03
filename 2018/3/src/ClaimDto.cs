@@ -4,14 +4,16 @@ namespace src
 {
     public class ClaimDto
     {
-        public ClaimDto(int leftEdge, int topEdge, int width, int height)
+        public ClaimDto(int id, int leftEdge, int topEdge, int width, int height)
         {
+            Id = id;
             LeftEdgePosition = leftEdge;
             TopEdgePosition = topEdge;
             Width = width;
             Height = height;
         }
 
+        public int Id { get; }
         public int LeftEdgePosition { get; }
         public int TopEdgePosition { get; }
         public int Width { get; }
