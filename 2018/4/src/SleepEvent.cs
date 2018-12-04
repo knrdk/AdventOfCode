@@ -2,9 +2,9 @@ using System;
 
 namespace src
 {
-    public class LogDto
+    public class SleepEvent
     {
         public DateTime DateTime { get; set; }
-        public string Value {get;set;}
+        public bool IsFallingAsleep {get;set;}
     }
 }

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
 
 namespace src
 {
@@ -10,73 +11,62 @@ namespace src
         static void Main(string[] args)
         {
             string filename = args[0];
-            List<LogDto> inputs = File.ReadAllLines(filename).Select(Parser.Parse).ToList();
-            inputs.Sort((x, y) => DateTime.Compare(x.DateTime, y.DateTime));
+            var inputs = File
+                .ReadAllLines(filename)
+                .Select(Parser.Parse)
+                .OrderBy(x => x.DateTime)
+                .Aggregate(new Guards(), CreateModel);
 
+            IEnumerable<Guard> guards = inputs.AllGuards;
 
-            Dictionary<int, int> totalTimeAsleep = new Dictionary<int, int>();
-            Dictionary<int, int[]> minutesAsleep = new Dictionary<int, int[]>();
+            List<GuardSleepingActivity> guardsSleepingActivity = guards.Select(CalcualteGuardSleepingActivity).ToList();
 
-            int currentGuardId = 0;
-            int minuteFallAsleep = 0;
-            foreach (var input in inputs)
-            {
-                if (input.Id > 0)
-                {
-                    currentGuardId = input.Id;
-                }
-                else if (input.FallsAsleep)
-                {
-                    minuteFallAsleep = input.DateTime.Minute;
-                }
-                else
-                {
-                    int minutesSlept = input.DateTime.Minute - minuteFallAsleep;
-                    if (!totalTimeAsleep.ContainsKey(currentGuardId))
-                    {
-                        totalTimeAsleep[currentGuardId] = 0;
-                        minutesAsleep[currentGuardId] = new int[60];
-                    }
-                    totalTimeAsleep[currentGuardId] += minutesSlept;
-
-                    for (int i = minuteFallAsleep; i < input.DateTime.Minute; i++)
-                    {
-                        minutesAsleep[currentGuardId][i] += 1;
-                    }
-                }
-            }
-            int mostSleepingGuard = totalTimeAsleep.OrderBy(x => x.Value).Last().Key;
-            int maxKey = -1;
-            int maxValue = -1;
-            for (int i = 0; i < 60; i++)
-            {
-                int currentValue = minutesAsleep[mostSleepingGuard][i];
-                if (currentValue > maxValue)
-                {
-                    maxValue = currentValue;
-                    maxKey = i;
-                }
-            }
-            Console.WriteLine($"Part1 - Guard {mostSleepingGuard} minute {maxKey}");
+            // part 1
+            GuardSleepingActivity part1Winner = guardsSleepingActivity.OrderBy(x => x.TotalSleepingTime).Last();
+            ShowWinner(part1Winner);
 
             // part 2
-            maxKey = -1;
-            maxValue = -1;
-            int maxGuardId = -1;
-            foreach (int guardId in minutesAsleep.Keys)
-            {                
-                for (int i = 0; i < 60; i++)
-                {
-                    int currentValue = minutesAsleep[guardId][i];
-                    if (currentValue > maxValue)
-                    {
-                        maxValue = currentValue;
-                        maxKey = i;
-                        maxGuardId = guardId;
-                    }
-                }
+            GuardSleepingActivity part2Winner = guardsSleepingActivity.OrderBy(x => x.GetMostSleepMinuteCount()).Last();
+            ShowWinner(part2Winner);
+        }
+
+        private static Guards CreateModel(Guards guards, LogDto logLine)
+        {
+            Regex idRegex = new Regex(@"^.*#(\d*).*$", RegexOptions.Compiled);
+            if (logLine.Value.Contains('#'))
+            {
+                Match idMatch = idRegex.Match(logLine.Value);
+                int id = int.Parse(idMatch.Groups[1].Value);
+                var guard = new Guard(id);
+                guards.Add(guard);
             }
-            Console.WriteLine($"Part2 - Guard {maxGuardId} minute {maxKey}");
+            else
+            {
+                var sleepEvent = new SleepEvent
+                {
+                    DateTime = logLine.DateTime,
+                    IsFallingAsleep = logLine.Value.Contains("asleep")
+                };
+                guards.Add(sleepEvent);
+            }
+            return guards;
+        }
+
+        private static GuardSleepingActivity CalcualteGuardSleepingActivity(Guard guard)
+        {
+            var sleepingActivity = new GuardSleepingActivity(guard.Id);
+            for (int i = 0; i < guard.Events.Count; i += 2)
+            {
+                var startEvent = guard.Events[i];
+                var endEvent = guard.Events[i + 1];
+                sleepingActivity.Sleep(startEvent.DateTime.Minute, endEvent.DateTime.Minute);
+            }
+            return sleepingActivity;
+        }
+
+        public static void ShowWinner(GuardSleepingActivity winner)
+        {
+            Console.WriteLine($"Part 1 - Guard id: {winner.Id} total sleeping time: {winner.GetMostSleepMinute()}");
         }
     }
 }
