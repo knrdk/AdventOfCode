@@ -51,12 +51,32 @@ namespace src
             for (int i = 0; i < 60; i++)
             {
                 int currentValue = minutesAsleep[mostSleepingGuard][i];
-                if(currentValue > maxValue){
+                if (currentValue > maxValue)
+                {
                     maxValue = currentValue;
                     maxKey = i;
                 }
             }
-            Console.WriteLine($"Guard {mostSleepingGuard} minute {maxKey}");
+            Console.WriteLine($"Part1 - Guard {mostSleepingGuard} minute {maxKey}");
+
+            // part 2
+            maxKey = -1;
+            maxValue = -1;
+            int maxGuardId = -1;
+            foreach (int guardId in minutesAsleep.Keys)
+            {                
+                for (int i = 0; i < 60; i++)
+                {
+                    int currentValue = minutesAsleep[guardId][i];
+                    if (currentValue > maxValue)
+                    {
+                        maxValue = currentValue;
+                        maxKey = i;
+                        maxGuardId = guardId;
+                    }
+                }
+            }
+            Console.WriteLine($"Part2 - Guard {maxGuardId} minute {maxKey}");
         }
     }
 }
