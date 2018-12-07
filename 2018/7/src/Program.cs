@@ -12,64 +12,46 @@ namespace src
         {
             string fileName = args[0];
             List<(char BlockingTask, char BlockedTask)> inputs = File.ReadLines(fileName).Select(Parse).ToList();
-            List<char> allTasks = inputs
-                .Select(x => x.BlockingTask)
-                .Concat(inputs.Select(x => x.BlockedTask))
-                .ToHashSet()
-                .OrderBy(x => x)
-                .ToList();
 
-            int numberOfTasks = allTasks.Count;
-            Dictionary<char, int> tasksToGraphIdMapping = Enumerable.Range(0, numberOfTasks).ToDictionary(i => allTasks[i], i => i);
-
-            Solve1(numberOfTasks, inputs, allTasks.ToList(), tasksToGraphIdMapping);
-            Solve2(numberOfTasks, inputs, allTasks.ToList(), tasksToGraphIdMapping);
+            Solve1(inputs);
+            Solve2(inputs);
         }
 
-        private static void Solve1(
-            int numberOfTasks,
-            List<(char BlockingTask, char BlockedTask)> inputs,
-            List<char> allTasks,
-            Dictionary<char, int> tasksToGraphIdMapping
-            )
+        private static void Solve1(List<(char BlockingTask, char BlockedTask)> inputs)
         {
-            bool[,] graph = CreateGraph(numberOfTasks, inputs, tasksToGraphIdMapping);
-            StringBuilder resultBuilder = new StringBuilder(numberOfTasks);
-            while (allTasks.Any())
+            TasksSchedule<char> tasksSchedule = TasksSchedule<char>.Create(inputs);
+
+            StringBuilder resultBuilder = new StringBuilder(tasksSchedule.NumberOfTasks);
+            while (!tasksSchedule.IsEmpty)
             {
-                char? nonBlocked = GetFirstNonBlocked(allTasks, tasksToGraphIdMapping, graph);
-                resultBuilder.Append(nonBlocked);
-                allTasks.Remove(nonBlocked.Value);
-                UnblockBlockedTasks(tasksToGraphIdMapping[nonBlocked.Value], graph);
+                char? nonBlocked = tasksSchedule.GetFirstNonBlocked();
+                tasksSchedule.MarkAsCompleted(nonBlocked.Value);
+
+                resultBuilder.Append(nonBlocked.Value);
             }
             Console.WriteLine($"Part1: {resultBuilder}");
         }
 
-        private static void Solve2(
-            int numberOfTasks,
-            List<(char BlockingTask, char BlockedTask)> inputs,
-            List<char> allTasks,
-            Dictionary<char, int> tasksToGraphIdMapping
-            )
+        private static void Solve2(List<(char BlockingTask, char BlockedTask)> inputs)
         {
             const int numberOfWorkers = 5;
             Dictionary<char, int> tasksDuration = GetTaskDurations();
 
-            bool[,] graph = CreateGraph(numberOfTasks, inputs, tasksToGraphIdMapping);
+            TasksSchedule<char> tasksSchedule = TasksSchedule<char>.Create(inputs);
             var executingTasks = new List<(char ExecutingTask, int TimeLeft)>();
 
             int timeElapsed = 0;
-            while (allTasks.Any() || executingTasks.Count > 0)
-            {                
+            while (!tasksSchedule.IsEmpty || executingTasks.Count > 0)
+            {
                 // add new Items
                 bool isEachTaskBlocked = false;
                 while (!isEachTaskBlocked && executingTasks.Count < numberOfWorkers)
                 {
-                    char? nonBlocked = GetFirstNonBlocked(allTasks, tasksToGraphIdMapping, graph);
+                    char? nonBlocked = tasksSchedule.GetFirstNonBlocked();
                     if (nonBlocked.HasValue)
                     {
                         executingTasks.Add((nonBlocked.Value, tasksDuration[nonBlocked.Value]));
-                        allTasks.Remove(nonBlocked.Value);
+                        tasksSchedule.MarkAsExecuting(nonBlocked.Value);
                     }
                     else
                     {
@@ -87,7 +69,7 @@ namespace src
                     int newTimeLeft = timeLeft - 1;
                     if (newTimeLeft == 0)
                     {
-                        UnblockBlockedTasks(tasksToGraphIdMapping[taskId], graph);
+                        tasksSchedule.MarkAsCompleted(taskId);
                     }
                     else
                     {
@@ -111,49 +93,6 @@ namespace src
                 result[c] = totalDuration;
             }
             return result;
-        }
-
-        private static bool[,] CreateGraph(int numberOfTasks, List<(char BlockingTask, char BlockedTask)> inputs, Dictionary<char, int> tasksToGraphIdMapping)
-        {
-            bool[,] graph = new bool[numberOfTasks, numberOfTasks];
-            foreach ((char blockingTask, char blockedTask) in inputs)
-            {
-                graph[tasksToGraphIdMapping[blockingTask], tasksToGraphIdMapping[blockedTask]] = true;
-            }
-            return graph;
-        }
-
-        private static char? GetFirstNonBlocked(List<char> tasks, Dictionary<char, int> mapping, bool[,] graph)
-        {
-            foreach (char task in tasks)
-            {
-                if (!IsBlocked(mapping[task], graph))
-                {
-                    return task;
-                }
-            }
-            return null;
-        }
-
-
-        private static bool IsBlocked(int vertex, bool[,] graph)
-        {
-            for (int i = 0; i < graph.GetLength(0); i++)
-            {
-                if (graph[i, vertex])
-                {
-                    return true;
-                }
-            }
-            return false;
-        }
-
-        private static void UnblockBlockedTasks(int vertex, bool[,] graph)
-        {
-            for (int j = 0; j < graph.GetLength(1); j++)
-            {
-                graph[vertex, j] = false;
-            }
         }
 
         private static (char BlockingTask, char BlockedTask) Parse(string line)
