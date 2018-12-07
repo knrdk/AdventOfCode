@@ -60,7 +60,26 @@ namespace src
 
             int timeElapsed = 0;
             while (allTasks.Any() || executingTasks.Count > 0)
-            {
+            {                
+                // add new Items
+                bool isEachTaskBlocked = false;
+                while (!isEachTaskBlocked && executingTasks.Count < numberOfWorkers)
+                {
+                    char? nonBlocked = GetFirstNonBlocked(allTasks, tasksToGraphIdMapping, graph);
+                    if (nonBlocked.HasValue)
+                    {
+                        executingTasks.Add((nonBlocked.Value, tasksDuration[nonBlocked.Value]));
+                        allTasks.Remove(nonBlocked.Value);
+                    }
+                    else
+                    {
+                        isEachTaskBlocked = true;
+                    }
+                }
+
+                // do work
+                timeElapsed++;
+
                 // decreseTime & remove
                 var newExecutingTasks = new List<(char ExecutingTask, int TimeLeft)>();
                 foreach ((char taskId, int timeLeft) in executingTasks)
@@ -77,26 +96,6 @@ namespace src
                 }
                 executingTasks = newExecutingTasks;
 
-                // add new Items
-                bool isEachTaskBlocked = false;
-                while (!isEachTaskBlocked && executingTasks.Count <= numberOfWorkers)
-                {
-                    char? nonBlocked = GetFirstNonBlocked(allTasks, tasksToGraphIdMapping, graph);
-                    if (nonBlocked.HasValue)
-                    {
-                        executingTasks.Add((nonBlocked.Value, tasksDuration[nonBlocked.Value]));
-                        allTasks.Remove(nonBlocked.Value);
-                    }
-                    else
-                    {
-                        isEachTaskBlocked = true;
-                    }
-                }
-
-                if (executingTasks.Any() || allTasks.Any())
-                {
-                    timeElapsed++;
-                }
             }
             Console.WriteLine(timeElapsed);
         }
