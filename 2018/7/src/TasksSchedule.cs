@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace src
 {
-    public class TasksSchedule<T> where T : struct, IComparable<T>, IEquatable<T> // TODO get rid of struct constraint
+    public class TasksSchedule<T> where T : struct, IComparable<T>, IEquatable<T>
     {
         private List<T> _tasksToExecute;
         private Dictionary<T, int> _tasksToGraphIdMapping;
@@ -12,10 +12,14 @@ namespace src
 
         public int NumberOfTasks { get; }
 
-        public bool IsEmpty => !_tasksToExecute.Any();
+        public List<T> CompletedTasks { get; }
+
+        public bool AreAllTasksCompleted => CompletedTasks.Count == NumberOfTasks;
 
         private TasksSchedule(List<(T BlockingTask, T BlockedTask)> inputs)
         {
+            CompletedTasks = new List<T>();
+
             _tasksToExecute = inputs
                 .Select(x => x.BlockingTask)
                 .Concat(inputs.Select(x => x.BlockedTask))
@@ -29,7 +33,7 @@ namespace src
 
             _graph = CreateGraph(NumberOfTasks, inputs, _tasksToGraphIdMapping);
         }
-
+       
         public static TasksSchedule<T> Create(List<(T BlockingTask, T BlockedTask)> inputs)
         {
             return new TasksSchedule<T>(inputs);
@@ -54,6 +58,7 @@ namespace src
             {
                 _tasksToExecute.Remove(task);
             }
+            CompletedTasks.Add(task);
             UnblockBlockedTasks(task);
         }
 

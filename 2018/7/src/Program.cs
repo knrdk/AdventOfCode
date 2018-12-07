@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 
 namespace src
@@ -13,73 +14,35 @@ namespace src
             string fileName = args[0];
             List<(char BlockingTask, char BlockedTask)> inputs = File.ReadLines(fileName).Select(Parse).ToList();
 
-            Solve1(inputs);
-            Solve2(inputs);
+            Part1(inputs);
+            Part2(inputs);
         }
 
-        private static void Solve1(List<(char BlockingTask, char BlockedTask)> inputs)
+        private static void Part1(List<(char BlockingTask, char BlockedTask)> inputs)
         {
-            TasksSchedule<char> tasksSchedule = TasksSchedule<char>.Create(inputs);
-
-            StringBuilder resultBuilder = new StringBuilder(tasksSchedule.NumberOfTasks);
-            while (!tasksSchedule.IsEmpty)
-            {
-                char? nonBlocked = tasksSchedule.GetFirstNonBlocked();
-                tasksSchedule.MarkAsCompleted(nonBlocked.Value);
-
-                resultBuilder.Append(nonBlocked.Value);
-            }
-            Console.WriteLine($"Part1: {resultBuilder}");
+            var taskExecutor = new SingleThreadTaskExecutor<char>();
+            Solve(inputs, taskExecutor);
         }
 
-        private static void Solve2(List<(char BlockingTask, char BlockedTask)> inputs)
+        private static void Part2(List<(char BlockingTask, char BlockedTask)> inputs)
         {
-            const int numberOfWorkers = 5;
-            Dictionary<char, int> tasksDuration = GetTaskDurations();
+            var taskExecutor = new MultiThreadedTaskExecutor<char>(5, GetTaskDurations());
+            Solve(inputs, taskExecutor);
+        }
 
+        private static void Solve(List<(char BlockingTask, char BlockedTask)> inputs, ITaskExecutor<char> taskExecutor, [CallerMemberName] string partName = "")
+        {
             TasksSchedule<char> tasksSchedule = TasksSchedule<char>.Create(inputs);
-            var executingTasks = new List<(char ExecutingTask, int TimeLeft)>();
+            (char[] order, int duration) = taskExecutor.Execute(tasksSchedule);
 
-            int timeElapsed = 0;
-            while (!tasksSchedule.IsEmpty || executingTasks.Count > 0)
-            {
-                // add new Items
-                bool isEachTaskBlocked = false;
-                while (!isEachTaskBlocked && executingTasks.Count < numberOfWorkers)
-                {
-                    char? nonBlocked = tasksSchedule.GetFirstNonBlocked();
-                    if (nonBlocked.HasValue)
-                    {
-                        executingTasks.Add((nonBlocked.Value, tasksDuration[nonBlocked.Value]));
-                        tasksSchedule.MarkAsExecuting(nonBlocked.Value);
-                    }
-                    else
-                    {
-                        isEachTaskBlocked = true;
-                    }
-                }
+            string orderAsString = new string(order);
+            Console.WriteLine($"{partName}: Order {orderAsString}, duration: {duration}");
+        }
 
-                // do work
-                timeElapsed++;
-
-                // decreseTime & remove
-                var newExecutingTasks = new List<(char ExecutingTask, int TimeLeft)>();
-                foreach ((char taskId, int timeLeft) in executingTasks)
-                {
-                    int newTimeLeft = timeLeft - 1;
-                    if (newTimeLeft == 0)
-                    {
-                        tasksSchedule.MarkAsCompleted(taskId);
-                    }
-                    else
-                    {
-                        newExecutingTasks.Add((taskId, newTimeLeft));
-                    }
-                }
-                executingTasks = newExecutingTasks;
-
-            }
-            Console.WriteLine(timeElapsed);
+        private static (char BlockingTask, char BlockedTask) Parse(string line)
+        {
+            string[] splitted = line.Split(' ');
+            return (splitted[1].Single(), splitted[7].Single());
         }
 
         private static Dictionary<char, int> GetTaskDurations()
@@ -93,12 +56,6 @@ namespace src
                 result[c] = totalDuration;
             }
             return result;
-        }
-
-        private static (char BlockingTask, char BlockedTask) Parse(string line)
-        {
-            string[] splitted = line.Split(' ');
-            return (splitted[1].Single(), splitted[7].Single());
         }
     }
 }
