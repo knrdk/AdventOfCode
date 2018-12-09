@@ -3,14 +3,14 @@ using System.Text;
 
 namespace src
 {
-    class Board
+    class Board<T>
     {
-        LinkedList<int> _board = new LinkedList<int>();
-        LinkedListNode<int> _currentNode;
+        LinkedList<T> _board = new LinkedList<T>();
+        LinkedListNode<T> _currentNode;
 
         public Board()
         {
-            _board.AddFirst(0);
+            _board.AddFirst(default(T));
             _currentNode = _board.First;
         }
 
@@ -26,21 +26,21 @@ namespace src
             }
         }
 
-        public void AddClockwiseToCurrent(int value)
+        public void AddClockwiseToCurrent(T value)
         {
             _board.AddAfter(_currentNode, value);
         }
 
-        public void AddClockwiseToCurrentAndSelect(int value)
+        public void AddClockwiseToCurrentAndSelect(T value)
         {
             AddClockwiseToCurrent(value);
             MoveClockwise(1);
         }
 
-        public int RemoveCounterClockwise()
+        public T RemoveCounterClockwise()
         {
-            LinkedListNode<int> _nodeToBeRemoved = _currentNode.Previous;
-            int valueOfRemovedNode = _nodeToBeRemoved.Value;
+            LinkedListNode<T> _nodeToBeRemoved = _currentNode.Previous;
+            T valueOfRemovedNode = _nodeToBeRemoved.Value;
             _board.Remove(_nodeToBeRemoved);
             return valueOfRemovedNode;
         }
@@ -63,7 +63,7 @@ namespace src
 
         public override string ToString(){
             var stringBuilder = new StringBuilder();
-            LinkedListNode<int> current = _board.First;
+            LinkedListNode<T> current = _board.First;
             while(current != null){                
                 string toAppend = current == _currentNode ? $"({current.Value}) " : $"{current.Value} ";
                 stringBuilder.Append(toAppend);

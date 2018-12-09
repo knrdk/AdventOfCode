@@ -8,24 +8,24 @@ namespace src
         static void Main(string[] args)
         {
             int numberOfPlayers = int.Parse(args[0]);
-            int lastMarble = int.Parse(args[1]);
+            long lastMarble = long.Parse(args[1]);
 
-            int winningScore = SolvePart1(numberOfPlayers, lastMarble);
+            long winningScore = Solve(numberOfPlayers, lastMarble);
             Console.WriteLine(winningScore);
         }
 
-        private static int SolvePart1(int numberOfPlayers, int lastMarble)
+        private static long Solve(int numberOfPlayers, long lastMarble)
         {
             Player[] players = Enumerable
                 .Range(1, numberOfPlayers)
                 .Select(id => new Player(id))
                 .ToArray();
 
-            var board = new Board();
-            for (int i = 0; i < lastMarble; i++)
+            var board = new Board<long>();
+            for (long i = 0; i < lastMarble; i++)
             {
-                int marbleValue = i + 1;
-                int playerId = i % numberOfPlayers;
+                long marbleValue = i + 1;
+                int playerId = (int)(i % numberOfPlayers);
                 if (marbleValue % 23 != 0)
                 {
                     board.MoveCurrent(1);
@@ -34,13 +34,13 @@ namespace src
                 else
                 {
                     board.MoveCurrent(-6);
-                    int removedValue = board.RemoveCounterClockwise();
-                    int scored = removedValue + marbleValue;
+                    long removedValue = board.RemoveCounterClockwise();
+                    long scored = removedValue + marbleValue;
                     players[playerId].AddToScore(scored);
                 }
             }
 
-            int winningScore = players.OrderByDescending(x=>x.Score).First().Score;
+            long winningScore = players.OrderByDescending(x => x.Score).First().Score;
             return winningScore;
         }
     }
