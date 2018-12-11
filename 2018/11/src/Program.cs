@@ -23,21 +23,27 @@ namespace src
             int maxValue = int.MinValue;
             int maxX = -1;
             int maxY = -1;
-            for (int i = 0; i < size - 2; i++)
+            int maxSize = -1;
+            int[,] valuesOfSquares = new int[size, size];
+            for (int sizeOfSquare = 1; sizeOfSquare < size; sizeOfSquare++)
             {
-                for (int j = 0; j < size - 2; j++)
+                for (int i = 0; i < size - (sizeOfSquare - 1); i++)
                 {
-                    int currentValue = CalculateValueOfSquare(powerLevels, i, j);
-                    if (currentValue > maxValue)
+                    for (int j = 0; j < size - (sizeOfSquare - 1); j++)
                     {
-                        maxValue = currentValue;
-                        maxX = i + 1;
-                        maxY = j + 1;
+                        int currentValue = CalculateValueOfSquare(powerLevels, i, j, valuesOfSquares, sizeOfSquare);
+                        if (currentValue > maxValue)
+                        {
+                            maxValue = currentValue;
+                            maxX = i + 1;
+                            maxY = j + 1;
+                            maxSize = sizeOfSquare;
+                        }
                     }
                 }
             }
 
-            Console.WriteLine($"{maxX}, {maxY}");
+            Console.WriteLine($"{maxX}, {maxY}, {maxSize}");
         }
 
         public static int CalculatePowerLevel(int serialNumber, int x, int y)
@@ -50,16 +56,18 @@ namespace src
             return hundreadsDigit - 5;
         }
 
-        public static int CalculateValueOfSquare(int[,] powerLevels, int i, int j)
+        public static int CalculateValueOfSquare(int[,] powerLevels, int i, int j, int[,] valuesOfSquares, int sizeOfSquare)
         {
-            int result = 0;
-            for (int a = i; a < i + 3; a++)
+            int result = valuesOfSquares[i, j];
+            for (int a = i; a < i + sizeOfSquare; a++)
             {
-                for (int b = j; b < j + 3; b++)
-                {
-                    result += powerLevels[a, b];
-                }
+                result += powerLevels[a, (j + sizeOfSquare - 1)];
             }
+            for (int b = j; b < j + sizeOfSquare -1; b++)
+            {
+                result += powerLevels[(i + sizeOfSquare - 1), b];
+            }
+            valuesOfSquares[i, j] = result;
             return result;
         }
     }
