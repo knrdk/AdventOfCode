@@ -16,16 +16,14 @@ namespace src
             int part1Result = 0;
             foreach ((int[] startRegisters, int[] input, int[] expectedRegister) in inputs)
             {
-                int matchingOperands = GetNumberOfMatchingOperands(proc, startRegisters, input, expectedRegister);
-                part1Result += matchingOperands >= 3 ? 1 : 0;
+                string[] matchingOperands = GetMatchingOperands(proc, startRegisters, input, expectedRegister).ToArray();
+                part1Result += matchingOperands.Length >= 3 ? 1 : 0;
             }
             Console.WriteLine(part1Result);
-
         }
 
-        private static int GetNumberOfMatchingOperands(Processor proc, int[] startRegisters, int[] input, int[] expectedOutput)
+        private static IEnumerable<string> GetMatchingOperands(Processor proc, int[] startRegisters, int[] input, int[] expectedOutput)
         {
-            int result = 0;
             foreach (string operand in proc.AvailableOperands)
             {
                 startRegisters.CopyTo(proc.Registers, 0);
@@ -34,10 +32,9 @@ namespace src
 
                 if (proc.Registers.SequenceEqual(expectedOutput))
                 {
-                    result++;
+                    yield return operand;
                 }
             }
-            return result;
         }
     }
 }
