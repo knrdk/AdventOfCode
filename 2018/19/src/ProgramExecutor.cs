@@ -16,10 +16,22 @@ namespace src
         public bool IsEnded => CommandToExecute >= _commands.Length;
 
         public ProgramExecutor(int instructionPointerRegister, Command[] commands)
+        : this(new Processor(6), instructionPointerRegister, commands)
+        { }
+
+        public ProgramExecutor(Processor processor, int instructionPointerRegister, Command[] commands)
         {
-            _processor = new Processor(6);
+            _processor = processor;
             _instructionPointerRegister = instructionPointerRegister;
             _commands = commands;
+        }
+
+        public void ExecuteWholeProgram()
+        {
+            while (!IsEnded)
+            {
+                ExecuteNextCommand();
+            }
         }
 
         public void ExecuteNextCommand()

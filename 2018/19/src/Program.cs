@@ -18,17 +18,33 @@ namespace src
             // parse input
             int instructionPointerRegister = ParseInstructionPointerLine(firstLine);
             Command[] commands = commandLines.Select(ParseCommandLine).ToArray();
-            
+
+            SolvePart1(instructionPointerRegister, commands);
+            SolvePart2(instructionPointerRegister, commands);
+        }
+
+        private static void SolvePart1(int instructionPointerRegister, Command[] commands)
+        {
             // execute program
             var programExecutor = new ProgramExecutor(instructionPointerRegister, commands);
-            while (!programExecutor.IsEnded)
-            {
-                programExecutor.ExecuteNextCommand();
-            }
-            
+            programExecutor.ExecuteWholeProgram();
+
             // print result
-            Console.WriteLine(programExecutor);
+            Console.WriteLine($"Part1: {programExecutor}");
         }
+
+        private static void SolvePart2(int instructionPointerRegister, Command[] commands)
+        {
+            // execute program
+            var processor = new Processor(6);
+            processor.Registers[0] = 1;
+            var programExecutor = new ProgramExecutor(processor, instructionPointerRegister, commands);
+            programExecutor.ExecuteWholeProgram();
+
+            // print result
+            Console.WriteLine($"Part2: {programExecutor}");
+        }
+
 
         private static int ParseInstructionPointerLine(string instructionPointerLine)
         {

@@ -45,7 +45,18 @@ namespace src
                 ["gtrr"] = (a, b, c) => { Registers[c] = Registers[a] > Registers[b] ? 1 : 0; },
                 ["eqir"] = (a, b, c) => { Registers[c] = a == Registers[b] ? 1 : 0; },
                 ["eqri"] = (a, b, c) => { Registers[c] = Registers[a] == b ? 1 : 0; },
-                ["eqrr"] = (a, b, c) => { Registers[c] = Registers[a] == Registers[b] ? 1 : 0; }
+                ["eqrr"] = (a, b, c) => { Registers[c] = Registers[a] == Registers[b] ? 1 : 0; },
+                ["NONE"] = (a, b, c) => { },
+                ["SPEC"] = (a, b, c) =>
+                {
+                    long r4 = Registers[4];
+                    long r2 = Registers[2];
+                    if (r4 % r2 == 0)
+                    {
+                        Registers[0] += Registers[2];
+                    }
+                    Registers[5] = Registers[4] + 1;
+                },
             };
         }
 
