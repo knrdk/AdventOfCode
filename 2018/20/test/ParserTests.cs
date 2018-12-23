@@ -122,7 +122,7 @@ namespace Tests
         public void ShouldReturnCorrectNumberOfNoncyclicWordsForComplexBranchesWithOptional()
         {
             // arrange
-            const int expected = 4;
+            const int expected = 5;
             string input = $"^ESSWWN(E|NNENN(EESS(WNSE|)SSS|WWWSSSSE(SW|NNNE)))$";
 
             // act
