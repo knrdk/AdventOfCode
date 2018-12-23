@@ -1,0 +1,2 @@
+There is cycle of length 28
+So, I subtracted 750 from 1000000000, then divide modulo 28, it gave 26, so I checked values for 776

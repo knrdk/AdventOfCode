@@ -19,10 +19,22 @@ namespace src
             string fileName = args[0];
             string[] inputLines = File.ReadAllLines(fileName);
 
+            Dictionary<long, int> resourceValues = new Dictionary<long, int>();
             Area area = BuildArea(inputLines);
-            for (int i = 0; i < 10; i++)
+            for (long i = 0; i < 1000; i++)
             {
                 area = area.GetNext();
+
+                int value = area.ResourceValues;
+                if (resourceValues.Values.Contains(value))
+                {
+                    long key = resourceValues.Single(x=>x.Value == value).Key;
+                    Console.WriteLine($"{i+1} - {key} - {value}");
+                }
+                else
+                {
+                    resourceValues[i] = value;
+                }
             }
             Console.WriteLine(area);
             Console.WriteLine(area.ResourceValues);
