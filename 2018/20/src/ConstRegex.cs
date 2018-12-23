@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 
 namespace src
 {
@@ -18,6 +19,11 @@ namespace src
         public string GetLongestNonCyclicWord()
         {
             return _value;
+        }
+
+        public IEnumerable<string> GetNonCyclicWords()
+        {
+            yield return _value;
         }
     }
 }

@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 
 namespace src
 {
@@ -27,6 +28,17 @@ namespace src
                 }
             }
             return longestWord;
+        }
+
+        public IEnumerable<string> GetNonCyclicWords()
+        {
+            foreach (IRegex branch in _branches)
+            {
+                foreach (string word in branch.GetNonCyclicWords())
+                {
+                    yield return word;
+                }
+            }
         }
     }
 }

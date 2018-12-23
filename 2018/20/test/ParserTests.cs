@@ -1,6 +1,7 @@
 using System;
 using src;
 using NUnit.Framework;
+using System.Linq;
 
 namespace Tests
 {
@@ -62,7 +63,49 @@ namespace Tests
         }
 
         [Test]
+        public void ShouldReturnCorrectNumberOfNoncyclicWordsForOneBranch()
+        {
+            // arrange
+            const int expectedNumberOfWords = 2;
+            string input = $"^SN(E|TRE)$";
+
+            // act
+            IRegex result = Parser.Parse(input);
+
+            // assert
+            Assert.AreEqual(expectedNumberOfWords, result.GetNonCyclicWords().Count());
+        }
+
+        [Test]
         public void ShouldReturnValueForComplexBranches()
+        {
+            // arrange
+            const string expected = "WSSEESWWWNWNENNEEEENNESSSSWNWSW";
+            string input = $"^WSSEESWWWNW(S|NENNEEEENN(ESSSSW(NWSW|SSEN)|WSWWN(E|WWS(E|SS))))$";
+
+            // act
+            IRegex result = Parser.Parse(input);
+
+            // assert
+            Assert.AreEqual(expected, result.GetLongestNonCyclicWord());
+        }
+
+        [Test]
+        public void ShouldReturnCorrectNumberOfNoncyclicWordsForComplexBranches()
+        {
+            // arrange
+            const int expected = 6;
+            string input = $"^WSSEESWWWNW(S|NENNEEEENN(ESSSSW(NWSW|SSEN)|WSWWN(E|WWS(E|SS))))$";
+
+            // act
+            IRegex result = Parser.Parse(input);
+
+            // assert
+            Assert.AreEqual(expected, result.GetNonCyclicWords().Count());
+        }
+
+        [Test]
+        public void ShouldReturnValueForComplexBranchesWithOptional()
         {
             // arrange
             const string expected = "ESSWWNNNENNWWWSSSSENNNE";
@@ -76,17 +119,17 @@ namespace Tests
         }
 
         [Test]
-        public void ShouldReturnValueForComplexBranchesSecondTest()
+        public void ShouldReturnCorrectNumberOfNoncyclicWordsForComplexBranchesWithOptional()
         {
             // arrange
-            const string expected = "WSSEESWWWNWNENNEEEENNESSSSWNWSW";
-            string input = $"^WSSEESWWWNW(S|NENNEEEENN(ESSSSW(NWSW|SSEN)|WSWWN(E|WWS(E|SS))))$";
+            const int expected = 4;
+            string input = $"^ESSWWN(E|NNENN(EESS(WNSE|)SSS|WWWSSSSE(SW|NNNE)))$";
 
             // act
             IRegex result = Parser.Parse(input);
 
             // assert
-            Assert.AreEqual(expected, result.GetLongestNonCyclicWord());
+            Assert.AreEqual(expected, result.GetNonCyclicWords().Count());
         }
     }
 }

@@ -69,7 +69,7 @@ namespace src
                     if (inputStream.Current == _BRANCH_ENDING)
                     {
                         inputStream.Eat(_BRANCH_ENDING);
-                        return new OptionalBranchRegex();
+                        return new OptionalBranchRegex(branches.ToArray());
                     }
                 }
                 IRegex branch = ParseMultiPartRegex(inputStream);
