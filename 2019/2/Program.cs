@@ -15,17 +15,52 @@ namespace _2
                 .ReadAllLines(inputPath)
                 .First()
                 .Split(',')
-                .Select(x=>int.Parse(x))
-                .ToArray();               
+                .Select(x => int.Parse(x))
+                .ToArray();
 
-            input[1] = 12;
-            input[2] = 2;
-
-            Console.WriteLine($"Solution part 1: {ExecuteProgram(input)}");
+            Console.WriteLine($"Solution part 1: {SolvePart1(input)}");
+            Console.WriteLine($"Solution part 2: {SolvePart2(input)}");
         }
 
-        private static int ExecuteProgram(int[] program)
+        private static int SolvePart1(int[] program)
         {
+            int[] copiedProgram = CopyProgram(program);
+
+            return ExecuteProgram(copiedProgram, 12, 2);
+        }
+
+        private static int SolvePart2(int[] program)
+        {
+            const int expectedResult = 19690720;
+
+            for (int noun = 0; noun < 100; noun++)
+            {
+                for (int verb = 0; verb < 100; verb++)
+                {
+                    try
+                    {
+                        int[] copiedProgram = CopyProgram(program);
+                        int result = ExecuteProgram(copiedProgram, noun, verb);
+                        if (result == expectedResult)
+                        {
+                            return 100 * noun + verb;
+                        }
+                    }
+                    catch (InvalidOperationException)
+                    {
+                        // it means that arguments were invalid
+                    }
+                }
+            }
+
+            throw new ArgumentException("Program is invalid");
+        }
+
+        private static int ExecuteProgram(int[] program, int noun, int verb)
+        {
+            program[1] = noun;
+            program[2] = verb;
+
             int i = 0;
             while (true)
             {
@@ -55,6 +90,13 @@ namespace _2
 
                 i += 4;
             }
+        }
+
+        private static int[] CopyProgram(int[] program)
+        {
+            int[] copiedProgram = new int[program.Length];
+            Array.Copy(program, copiedProgram, program.Length);
+            return copiedProgram;
         }
     }
 }
