@@ -20,13 +20,24 @@ namespace _3
             var secondLinePoints = GetAllPoints(secondLineParsed);
 
             var commonPoints = firstLinePoints.Intersect(secondLinePoints);
+
             int solution = commonPoints.Select(x => Math.Abs(x.Item1) + Math.Abs(x.Item2)).OrderBy(x => x).First();
             Console.WriteLine($"First part solution: {solution}");
+
+            int min = int.MaxValue;
+            foreach (var point in commonPoints)
+            {
+                int i1 = firstLinePoints.IndexOf(point) + 1;
+                int i2 = secondLinePoints.IndexOf(point) + 1;
+                int sum = i1 + i2;
+                min = Math.Min(min, sum);
+            }
+            Console.WriteLine($"Second part solution: {min}");
         }
 
-        static HashSet<(int, int)> GetAllPoints(IEnumerable<(int, Direction)> input)
+        static List<(int, int)> GetAllPoints(IEnumerable<(int, Direction)> input)
         {
-            HashSet<(int, int)> allPoints = new HashSet<(int, int)>();
+            var allPoints = new List<(int, int)>();
             (int, int) currentPoint = (0, 0);
             foreach ((int, Direction) move in input)
             {
@@ -47,6 +58,10 @@ namespace _3
                     else if (move.Item2 == Direction.Left)
                     {
                         currentPoint = (currentPoint.Item1 - 1, currentPoint.Item2);
+                    }
+                    else
+                    {
+                        throw new InvalidOperationException("Direction unknown");
                     }
 
                     allPoints.Add(currentPoint);
