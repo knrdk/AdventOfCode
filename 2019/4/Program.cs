@@ -10,15 +10,22 @@ namespace _4
             const int start = 171309;
             const int end = 643603;
 
-            int numberOfValidNumbers = Enumerable
+            int numberOfValidNumbersForPart1 = Enumerable
                 .Range(start, end - start + 1)
-                .Where(IsValid)
+                .Where(IsValidForPart1)
                 .Count();
 
-            Console.WriteLine($"Part 1 solution: {numberOfValidNumbers}");
+            Console.WriteLine($"Part 1 solution: {numberOfValidNumbersForPart1}");
+
+            int numberOfValidNumbersForPart2 = Enumerable
+                .Range(start, end - start + 1)
+                .Where(IsValidForPart2)
+                .Count();
+
+            Console.WriteLine($"Part 2 solution: {numberOfValidNumbersForPart2}");
         }
 
-        private static bool IsValid(int x)
+        private static bool IsValidForPart1(int x)
         {
             byte[] digits = GetDigits(x);
             bool haveEqualNeighbours = false;
@@ -31,6 +38,34 @@ namespace _4
                 haveEqualNeighbours |= digits[i] == digits[i + 1];
             }
             return haveEqualNeighbours;
+        }
+
+        private static bool IsValidForPart2(int x)
+        {
+            byte[] digits = GetDigits(x);
+            int groupSize = 0;
+            bool hadValidGroup = false;
+            for (int i = 0; i < 5; i++)
+            {
+                if (digits[i] > digits[i + 1])
+                {
+                    return false;
+                }
+                bool areNeighboursEqual = digits[i] == digits[i + 1];
+                if (areNeighboursEqual)
+                {
+                    groupSize = groupSize > 0 ? groupSize + 1 : 2;
+                }
+                else
+                {
+                    if (groupSize == 2)
+                    {
+                        hadValidGroup = true;
+                    }
+                    groupSize = 0;
+                }
+            }
+            return hadValidGroup || groupSize == 2;
         }
 
         private static byte[] GetDigits(int x)
