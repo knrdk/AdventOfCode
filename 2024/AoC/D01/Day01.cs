@@ -1,6 +1,6 @@
 namespace AoC.D01
 {
-    internal class Day01
+    internal class Day01 : ISolver
     {
         private readonly string _inputFile;
 
