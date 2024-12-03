@@ -4,9 +4,9 @@ using AoC.D02;
 // See https://aka.ms/new-console-template for more information
 Console.WriteLine("Hello. Solving Aoc exercise!");
 
-string inputPath = @"C:\Users\knrdk\source\repos\AdventOfCode\2024\AoC\D02\sample";
+string inputPath = @"C:\Users\knrdk\source\repos\AdventOfCode\2024\AoC\D03\input";
 
-ISolver solver = new Day02(inputPath);
+ISolver solver = new Day03(inputPath);
 
 string part1Solution = await solver.SolvePart1();
 Console.WriteLine($"Part1: {part1Solution}");
