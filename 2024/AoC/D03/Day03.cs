@@ -1,6 +1,6 @@
 using System.Text.RegularExpressions;
 
-namespace AoC.D02
+namespace AoC.D03
 {
     internal class Day03 : ISolver
     {
