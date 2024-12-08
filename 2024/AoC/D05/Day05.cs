@@ -1,5 +1,3 @@
-using System.Text.RegularExpressions;
-
 namespace AoC.D05
 {
     internal class Day05 : ISolver
