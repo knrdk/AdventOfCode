@@ -1,12 +1,12 @@
 ﻿using AoC;
-using AoC.D10;
+using AoC.D18;
 
 // See https://aka.ms/new-console-template for more information
 Console.WriteLine("Hello. Solving Aoc exercise!");
 
-string inputPath = @"C:\Users\knrdk\source\repos\AdventOfCode\2024\AoC\D10\input";
+string inputPath = @"C:\Users\knrdk\source\repos\AdventOfCode\2024\AoC\D18\input";
 
-ISolver solver = new Day10(inputPath);
+ISolver solver = new Day18(inputPath);
 
 string part1Solution = await solver.SolvePart1();
 Console.WriteLine($"Part1: {part1Solution}");
